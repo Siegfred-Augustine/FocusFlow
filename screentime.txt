@@ -1,1 +1,2 @@
-idea64.exe: 00 hours, 02 minutes
+idea64.exe: 00 hours, 00 minutes
+WindowsTerminal.exe: 00 hours, 00 minutes
