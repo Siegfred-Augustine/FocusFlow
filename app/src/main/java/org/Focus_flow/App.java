@@ -36,7 +36,7 @@ public class App {
     private static String lastActiveApp = "";
     private static long lastUpdateTime = System.currentTimeMillis();
     private static int screenTime;
-    private static int totalMins, totalHours;
+    private static int totalMins, totalHours, hoursTilNotify = 5;
 
     public static void main(String[] args) {
         if (!Platform.isWindows()) {
@@ -56,6 +56,7 @@ public class App {
 
                     addScreenTime("screentime.txt");
                     screenTime = totalMins + (60 * totalHours);
+                    notifyTask();
                     System.out.println("current total time - " + screenTime);
                 }
             }
@@ -163,6 +164,11 @@ public class App {
             }
         }catch(IOException e){
             e.printStackTrace();
+        }
+    }
+    public static void notifyTask(){
+        if(totalHours>hoursTilNotify && !Task.taskList.isEmpty()){
+            System.out.println("You still have tasks");//temporary
         }
     }
 }
