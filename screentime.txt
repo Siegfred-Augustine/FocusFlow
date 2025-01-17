@@ -1,0 +1,4 @@
+Screen Time Report - 2025-01-17T15:37:55.054667800
+----------------------------------------
+explorer.exe: 00 hours, 01 minutes
+idea64.exe: 00 hours, 00 minutes

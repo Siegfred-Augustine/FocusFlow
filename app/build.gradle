@@ -10,7 +10,11 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
+
+group = 'org.Focus-flow'
+version = '1.0-SNAPSHOT'
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -18,8 +22,14 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.guava:guava:31.1-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.1'
+
+
     // This dependency is used by the application.
-    implementation libs.guava
+
+    implementation 'net.java.dev.jna:jna:5.12.1'
+    implementation 'net.java.dev.jna:jna-platform:5.12.1'
 }
 
 testing {
@@ -38,8 +48,31 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.Focus_flow.App' // Ensure this is your main class
+        )
+    }
+}
 
+
+// Configure the run task using the modern configuration syntax
+tasks.withType(JavaExec).configureEach {
+    outputs.dir(layout.buildDirectory.dir("screentime-outputs"))
+    workingDir = layout.buildDirectory.dir("screentime-outputs")
+}
+tasks.named('clean') {
+    delete layout.buildDirectory.dir("screentime-outputs")
+}
 application {
     // Define the main class for the application.
-    mainClass = 'org.example.App'
+    mainClass = 'org.Focus_flow.App'
+}
+task zipJar(type: Zip) {
+    from 'build/libs' // JAR location
+    from 'docs' // Optional: include any other files (like docs)
+    include 'app-1.0-SNAPSHOT-all.jar' // Make sure to include the correct JAR file with its name and extension
+    archiveFileName = 'focusflow.zip' // Specify the name of the resulting zip file
+    destinationDirectory = file("$buildDir/distributions")
 }
