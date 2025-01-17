@@ -9,10 +9,13 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
 
+import javax.swing.*;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Timer;
+import javax.swing.JOptionPane;
 
 public class App {
         // Interface for Windows API calls
@@ -58,6 +61,8 @@ public class App {
                     screenTime = totalMins + (60 * totalHours);
                     notifyTask();
                     System.out.println("current total time - " + screenTime);
+                    Task.deadLineChecker();
+
                 }
             }
         } catch (InterruptedException e) {
@@ -168,7 +173,7 @@ public class App {
     }
     public static void notifyTask(){
         if(totalHours>hoursTilNotify && !Task.taskList.isEmpty()){
-            System.out.println("You still have tasks");//temporary
+            JOptionPane.showMessageDialog(null,"You still have tasks left to do!!", "Ongoing Tasks!", JOptionPane.WARNING_MESSAGE);
         }
     }
 }

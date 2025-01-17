@@ -1,4 +1,5 @@
 package org.Focus_flow;
+import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Task {
     }
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyy HH:mm");
     public static ArrayList<Task> taskList = new ArrayList<Task>();
+    public static ArrayList<Task> doneList = new ArrayList<Task>();
     Hierarchy taskImportance = Hierarchy.LOW;
     private String taskName;
     private String taskDescription;
@@ -50,9 +52,17 @@ public class Task {
     public void setTaskDeadline(LocalDateTime input){
         this.deadline = input;
     }
-    public boolean isDue(){
+    public static void deadLineChecker() {
         LocalDateTime current = LocalDateTime.now();
-        return !current.isBefore(this.deadline);
+        for (Task t : taskList) {
+            if (!current.isBefore(t.deadline)) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, "Deadline reached for: " + t.getTaskName(), "Deadline Notification", JOptionPane.WARNING_MESSAGE);
+                });
+                doneList.add(t);
+            }
+        }
+        taskList.removeAll(doneList);
     }
     public static void addTask(Task task) {
         taskList.add(task);
