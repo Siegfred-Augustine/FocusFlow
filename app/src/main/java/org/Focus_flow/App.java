@@ -35,6 +35,8 @@ public class App {
     private static final Map<String, Long> appScreenTime = new HashMap<>();
     private static String lastActiveApp = "";
     private static long lastUpdateTime = System.currentTimeMillis();
+    private static int screenTime;
+    private static int totalMins, totalHours;
 
     public static void main(String[] args) {
         if (!Platform.isWindows()) {
@@ -51,6 +53,9 @@ public class App {
                 if (System.currentTimeMillis() - lastUpdateTime >= 10000) {
                     saveToFile();
                     lastUpdateTime = System.currentTimeMillis();
+
+                    addScreenTime("screentime.txt");
+                    System.out.println("current total time - " + screenTime);
                 }
             }
         } catch (InterruptedException e) {
@@ -109,8 +114,8 @@ public class App {
         //LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt";
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
-            writer.println("Screen Time Report - " + LocalDateTime.now());
-            writer.println("----------------------------------------");
+            //writer.println("Screen Time Report - " + LocalDateTime.now());
+            //writer.println("----------------------------------------");
 
             // Sort apps by screen time
             List<Map.Entry<String, Long>> sortedApps = new ArrayList<>(appScreenTime.entrySet());
@@ -129,6 +134,32 @@ public class App {
             System.out.println("Screen time data saved to: " + fileName);
         } catch (IOException e) {
             System.err.println("Error saving to file: " + e.getMessage());
+        }
+    }
+    public static void addScreenTime(String filepath){
+        File filename = new File(filepath);
+        String line, timePart;
+        try(Scanner scan = new Scanner(filename)){
+            while(scan.hasNextLine()){
+                //scan.nextLine();
+                //scan.nextLine();
+                line = scan.nextLine();
+
+                int colonIndex = line.indexOf(':');
+                timePart = line.substring(colonIndex + 2);
+                line = timePart.replace(" hours,", "").replace(" minutes", "").trim();
+
+                String[] strippedTime = line.split(" ");
+                totalMins = Integer.parseInt(strippedTime[1]);
+                totalHours = Integer.parseInt(strippedTime[0]);
+
+                totalHours += totalMins / 60;
+                totalMins %= 60;
+
+                screenTime = totalMins + (60 * totalHours);
+            }
+        }catch(IOException e){
+            e.printStackTrace();
         }
     }
 }
