@@ -55,6 +55,7 @@ public class App {
                     lastUpdateTime = System.currentTimeMillis();
 
                     addScreenTime("screentime.txt");
+                    screenTime = totalMins + (60 * totalHours);
                     System.out.println("current total time - " + screenTime);
                 }
             }
@@ -139,24 +140,26 @@ public class App {
     public static void addScreenTime(String filepath){
         File filename = new File(filepath);
         String line, timePart;
+        totalMins = 0;
+        totalHours = 0;
         try(Scanner scan = new Scanner(filename)){
             while(scan.hasNextLine()){
                 //scan.nextLine();
                 //scan.nextLine();
                 line = scan.nextLine();
+                System.out.println(line);
 
                 int colonIndex = line.indexOf(':');
                 timePart = line.substring(colonIndex + 2);
                 line = timePart.replace(" hours,", "").replace(" minutes", "").trim();
 
                 String[] strippedTime = line.split(" ");
-                totalMins = Integer.parseInt(strippedTime[1]);
-                totalHours = Integer.parseInt(strippedTime[0]);
+                totalMins += Integer.parseInt(strippedTime[1]);
+                totalHours += Integer.parseInt(strippedTime[0]);
 
                 totalHours += totalMins / 60;
                 totalMins %= 60;
-
-                screenTime = totalMins + (60 * totalHours);
+                System.out.println(totalMins);
             }
         }catch(IOException e){
             e.printStackTrace();
