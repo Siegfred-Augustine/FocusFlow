@@ -18,6 +18,15 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
 
+
+import javax.swing.*;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.Timer;
+import javax.swing.JOptionPane;
+
+
 public class App {
         // Interface for Windows API calls
     public interface User32 extends Library {
@@ -40,7 +49,11 @@ public class App {
     private static String lastActiveApp = "";
     private static long lastUpdateTime = System.currentTimeMillis();
     private static int screenTime;
+
     private static String fileName = generateFileName();
+
+    //private static int totalMins, totalHours, hoursTilNotify = 5;
+
 
     public static void main(String[] args) {
         if (!Platform.isWindows()) {
@@ -61,7 +74,12 @@ public class App {
                     lastUpdateTime = System.currentTimeMillis();
 
                     //addScreenTime("screentime.txt");
-                    System.out.println("current total time - " + screenTime);
+                    //screenTime = totalMins + (60 * totalHours);
+                    //notifyTask();
+
+                    //System.out.println("current total time - " + screenTime);
+                    //Task.deadLineChecker();
+
                 }
             }
         } catch (InterruptedException e) {
@@ -169,8 +187,45 @@ public class App {
             System.out.println("Screen time data saved to: " + fileName);
         } catch (IOException e) {
             System.err.println("Error saving to CSV: " + e.getMessage());
+
         }
     }
+    /* 
+    public static void addScreenTime(String filepath){
+        File filename = new File(filepath);
+        String line, timePart;
+        totalMins = 0;
+        totalHours = 0;
+        try(Scanner scan = new Scanner(filename)){
+            while(scan.hasNextLine()){
+                //scan.nextLine();
+                //scan.nextLine();
+                line = scan.nextLine();
+                System.out.println(line);
+
+                int colonIndex = line.indexOf(':');
+                timePart = line.substring(colonIndex + 2);
+                line = timePart.replace(" hours,", "").replace(" minutes", "").trim();
+
+                String[] strippedTime = line.split(" ");
+                totalMins += Integer.parseInt(strippedTime[1]);
+                totalHours += Integer.parseInt(strippedTime[0]);
+
+                totalHours += totalMins / 60;
+                totalMins %= 60;
+                System.out.println(totalMins);
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+
+        }
+    }
+    public static void notifyTask(){
+        if(totalHours>hoursTilNotify && !Task.taskList.isEmpty()){
+            JOptionPane.showMessageDialog(null,"You still have tasks left to do!!", "Ongoing Tasks!", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+        */
 }
 
 

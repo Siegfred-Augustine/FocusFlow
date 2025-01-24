@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 Code.exe: 00 hours, 00 minutes
+=======
+opera.exe: 00 hours, 03 minutes
+idea64.exe: 00 hours, 02 minutes
+WindowsTerminal.exe: 00 hours, 01 minutes
+>>>>>>> 620194c5ac37cc9ec561a7249b38630f8160859a
