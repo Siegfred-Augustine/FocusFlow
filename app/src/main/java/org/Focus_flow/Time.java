@@ -6,8 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -72,7 +72,7 @@ public class Time {
 
         // Common method to get details of an activity
         public String getDetails() {
-            return "Activity: " + name + "\nDuration: " + duration + " minutes\nDescription: " + description;
+            return "Screentime: " + name + "\nDuration: " + duration + " minutes\nDescription: " + description;
         }
     }
 
@@ -80,7 +80,7 @@ public class Time {
     class Productive extends Screentime {
         private String category; // e.g., Communication, Office Work
 
-        public ProductiveActivity(String name, int duration, String description, String category) {
+        public Productive(String name, int duration, String description, String category) {
             super(name, duration, description);  // Call Activity constructor
             this.category = category;
         }
@@ -92,11 +92,11 @@ public class Time {
     }    
 
     // Subclass for Leisure activities (inherits from Activity, adds time limit)
-    class Leisure extends Activity {
+    class Leisure extends Screentime {
         private int timeLimit; // in minutes
         private boolean exceededLimit;
 
-        public LeisureActivity(String name, int duration, String description, int timeLimit) {
+        public Leisure(String name, int duration, String description, int timeLimit) {
             super(name, duration, description); // Call Activity constructor
             this.timeLimit = timeLimit;
             this.exceededLimit = duration > timeLimit;
@@ -161,58 +161,72 @@ public class Time {
         //generate report
     }
 
-    class Browser extends Activity {
-        private boolean isProductive; // If the browser activity is productive
-        private int productiveDuration; // Time spent on productive browsing
-        private int nonProductiveDuration; // Time spent on non-productive browsing
+    class Browser extends Screentime {
+        private boolean isProductive; // Flag to check if the browser activity is productive
+        private int productiveTime; // Time spent on productive activities (in minutes)
+        private int leisureTime; // Time spent on leisure activities (in minutes)
+        private int startTime; // Start time in minutes
+        private int finishTime; // Finish time in minutes
     
-        // Constructor for Browser class
-        public Browser(String name, String description) {
-            super(name, description);
-            this.isProductive = false; // Default is non-productive
-            this.productiveDuration = 0;
-            this.nonProductiveDuration = 0;
-        }
-    
-        // Set the browser to productive or non-productive
-        public void setProductivityStatus(boolean isProductive) {
+        // Constructor initializes with browser activity details and sets mode (productive or leisure)
+        public Browser(String name, int duration, String description, boolean isProductive) {
+            super(name, duration, description);
             this.isProductive = isProductive;
-        }
-    
-        // Track time spent on the browser and separate into productive and non-productive
-        @Override
-        public void trackScreenTime(int startTime, int endTime) {
-            super.trackScreenTime(startTime, endTime); // Calculate the overall time spent
-            int timeSpent = endTime - startTime; // Time spent on the browser
+            this.startTime = 0; // Initially, no time is tracked
+            this.finishTime = duration; // Initially, set the finish time as the given duration
             if (isProductive) {
-                productiveDuration += timeSpent;
+                this.productiveTime = duration;
+                this.leisureTime = 0;
             } else {
-                nonProductiveDuration += timeSpent;
+                this.leisureTime = duration;
+                this.productiveTime = 0;
             }
         }
     
-        // Get browser details including productive and non-productive times
+        // Method to track screen time for the browser depending on the mode (productive or leisure)
+        @Override
+        public void trackScreenTime(int duration) {
+            finishTime = startTime + duration; // Calculate finish time
+            int timeSpent = finishTime - startTime; // Get the time spent based on finish - start time
+            
+            // Based on the activity type (productive or leisure), track time accordingly
+            if (isProductive) {
+                productiveTime += timeSpent;
+            } else {
+                leisureTime += timeSpent;
+            }
+            this.duration += timeSpent; // Update the total duration
+        }
+    
+        // Method to switch between productive and leisure activity modes
+        public void toggleActivityType() {
+            isProductive = !isProductive;
+        }
+    
+        // Get the total productive time
+        public int getProductiveTime() {
+            return productiveTime;
+        }
+    
+        // Get the total leisure time
+        public int getLeisureTime() {
+            return leisureTime;
+        }
+    
+        // Method to get the details, including which mode the browser is in (productive or leisure)
         @Override
         public String getDetails() {
-            return super.getDetails() + "\n" +
-                   "Productive Time: " + productiveDuration + " minutes\n" +
-                   "Non-Productive Time: " + nonProductiveDuration + " minutes\n" +
-                   "Current Productivity Status: " + (isProductive ? "Productive" : "Non-Productive");
+            String activityType = isProductive ? "Productive" : "Leisure";
+            return super.getDetails() + "\nActivity Type: " + activityType + 
+                   "\nProductive Time: " + productiveTime + " minutes" +
+                   "\nLeisure Time: " + leisureTime + " minutes";
         }
     
-        // Reset the browser's productive and non-productive time
+        // Reset browser's duration and time tracking
         public void resetBrowserDuration() {
-            productiveDuration = 0;
-            nonProductiveDuration = 0;
+            super.resetDuration(); // Reset total duration
+            this.productiveTime = 0; // Reset productive time
+            this.leisureTime = 0; // Reset leisure time
         }
-    
-        // Get the productive time separately
-        public int getProductiveDuration() {
-            return productiveDuration;
-        }
-    
-        // Get the non-productive time separately
-        public int getNonProductiveDuration() {
-            return nonProductiveDuration;
-        }
+    }
 }
