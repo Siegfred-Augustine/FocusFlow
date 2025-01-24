@@ -3,19 +3,29 @@
  */
 package org.Focus_flow;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
 
+
 import javax.swing.*;
 import java.io.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Timer;
 import javax.swing.JOptionPane;
+
 
 public class App {
         // Interface for Windows API calls
@@ -39,14 +49,18 @@ public class App {
     private static String lastActiveApp = "";
     private static long lastUpdateTime = System.currentTimeMillis();
     private static int screenTime;
-    private static int totalMins, totalHours, hoursTilNotify = 5;
+
+    private static String fileName = generateFileName();
+
+    //private static int totalMins, totalHours, hoursTilNotify = 5;
+
 
     public static void main(String[] args) {
         if (!Platform.isWindows()) {
             System.err.println("This program only works on Windows.");
             return;
         }
-
+        aggregateScreentime();
         try {
             while (true) {
                 updateScreenTime();
@@ -54,23 +68,54 @@ public class App {
 
                 // Save to file every 5 minutes
                 if (System.currentTimeMillis() - lastUpdateTime >= 10000) {
-                    saveToFile();
+                    checkAndUpdateFileName();
+                    saveToCSV();
+                    
                     lastUpdateTime = System.currentTimeMillis();
 
-                    addScreenTime("screentime.txt");
-                    screenTime = totalMins + (60 * totalHours);
-                    notifyTask();
-                    System.out.println("current total time - " + screenTime);
-                    Task.deadLineChecker();
+                    //addScreenTime("screentime.txt");
+                    //screenTime = totalMins + (60 * totalHours);
+                    //notifyTask();
+
+                    //System.out.println("current total time - " + screenTime);
+                    //Task.deadLineChecker();
 
                 }
             }
         } catch (InterruptedException e) {
             System.err.println("Tracking interrupted: " + e.getMessage());
-            saveToFile(); // Save final data before exiting
+            saveToCSV(); // Save final data before exiting
         } catch (Exception e) {
             System.err.println("Unexpected error: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private static void aggregateScreentime(){
+        Map<String, Long> csvData = Time.readCSV(fileName);
+        if (csvData == null) {
+            csvData = new HashMap<>(); // Default to an empty map
+        }
+
+        // Merge the data from the CSV into the existing appScreenTime map
+        csvData.forEach((appName, totalTime) -> 
+            appScreenTime.merge(appName, totalTime, Long::sum)
+        );
+        System.out.println(appScreenTime);
+    }
+
+    private static String generateFileName() {
+        // Generate file name with today's date
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return "screentime_" + date + ".csv";
+    }
+
+    private static void checkAndUpdateFileName() {
+        // Get the current date and update fileName if it doesn't match
+        String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        if (!fileName.contains(currentDate)) {
+            fileName = generateFileName();
+            System.out.println("Updated file name to: " + fileName);
         }
     }
 
@@ -116,33 +161,36 @@ public class App {
         }
     }
 
-    private static void saveToFile(){
-        String fileName = "screentime.txt";
-        //LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt";
-
-        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
-            //writer.println("Screen Time Report - " + LocalDateTime.now());
-            //writer.println("----------------------------------------");
+    private static void saveToCSV() {
+        try (FileWriter writer = new FileWriter(fileName)) {
+            // Write header
+            writer.write("App Name,Hours,Minutes,Seconds\n");
 
             // Sort apps by screen time
             List<Map.Entry<String, Long>> sortedApps = new ArrayList<>(appScreenTime.entrySet());
             sortedApps.sort(Map.Entry.<String, Long>comparingByValue().reversed());
 
+            // Write app data
             for (Map.Entry<String, Long> entry : sortedApps) {
                 String appName = entry.getKey();
                 long seconds = entry.getValue();
                 long minutes = seconds / 60;
                 long hours = minutes / 60;
                 minutes %= 60;
+                seconds %= 60;
 
-                writer.printf("%s: %02d hours, %02d minutes%n", appName, hours, minutes);
+                System.out.println(Long.toString(seconds));
+
+                writer.write(String.format("%s,%d,%d,%d\n", appName, hours, minutes, seconds));
             }
 
             System.out.println("Screen time data saved to: " + fileName);
         } catch (IOException e) {
-            System.err.println("Error saving to file: " + e.getMessage());
+            System.err.println("Error saving to CSV: " + e.getMessage());
+
         }
     }
+    /* 
     public static void addScreenTime(String filepath){
         File filename = new File(filepath);
         String line, timePart;
@@ -169,6 +217,7 @@ public class App {
             }
         }catch(IOException e){
             e.printStackTrace();
+
         }
     }
     public static void notifyTask(){
@@ -176,5 +225,8 @@ public class App {
             JOptionPane.showMessageDialog(null,"You still have tasks left to do!!", "Ongoing Tasks!", JOptionPane.WARNING_MESSAGE);
         }
     }
+        */
 }
+
+
 
