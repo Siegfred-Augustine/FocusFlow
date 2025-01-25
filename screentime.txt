@@ -1,3 +1,3 @@
-opera.exe: 00 hours, 03 minutes
-idea64.exe: 00 hours, 02 minutes
-WindowsTerminal.exe: 00 hours, 01 minutes
+idea64.exe: 00 hours, 00 minutes
+java.exe: 00 hours, 00 minutes
+explorer.exe: 00 hours, 00 minutes

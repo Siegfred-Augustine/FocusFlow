@@ -9,13 +9,11 @@ import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.IntByReference;
 
-import javax.swing.*;
 import java.io.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.Timer;
 import javax.swing.JOptionPane;
+
+import static org.Focus_flow.ToDoList.taskListImportance;
 
 public class App {
         // Interface for Windows API calls
@@ -46,14 +44,15 @@ public class App {
             System.err.println("This program only works on Windows.");
             return;
         }
-
+        ToDoList todolist = new ToDoList();
+        todolist.UIbuilder();
         try {
             while (true) {
                 updateScreenTime();
                 Thread.sleep(1000); // Update every second
 
                 // Save to file every 5 minutes
-                if (System.currentTimeMillis() - lastUpdateTime >= 10000) {
+                if (System.currentTimeMillis() - lastUpdateTime >= 50000) {
                     saveToFile();
                     lastUpdateTime = System.currentTimeMillis();
 
@@ -61,8 +60,7 @@ public class App {
                     screenTime = totalMins + (60 * totalHours);
                     notifyTask();
                     System.out.println("current total time - " + screenTime);
-                    Task.deadLineChecker();
-
+                    //Task.deadLineChecker();
                 }
             }
         } catch (InterruptedException e) {
@@ -165,14 +163,14 @@ public class App {
 
                 totalHours += totalMins / 60;
                 totalMins %= 60;
-                System.out.println(totalMins);
+                //System.out.println(totalMins);
             }
         }catch(IOException e){
             e.printStackTrace();
         }
     }
     public static void notifyTask(){
-        if(totalHours>hoursTilNotify && !Task.taskList.isEmpty()){
+        if(totalHours>hoursTilNotify && !taskListImportance.isEmpty()){
             JOptionPane.showMessageDialog(null,"You still have tasks left to do!!", "Ongoing Tasks!", JOptionPane.WARNING_MESSAGE);
         }
     }

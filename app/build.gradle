@@ -11,14 +11,19 @@ plugins {
     id 'application'
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'org.Focus-flow'
-version = '1.0-SNAPSHOT'
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+version = '1.0-SNAPSHOT'
+javafx {
+    version = "23.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 dependencies {

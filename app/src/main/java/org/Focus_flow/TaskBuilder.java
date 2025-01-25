@@ -1,15 +1,21 @@
 package org.Focus_flow;
 
-import java.time.LocalDateTime;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class TaskBuilder extends Task{
-    public TaskBuilder(String name, String description, LocalDateTime deadline) {
-        super(name, description, deadline);
-        addTask(this);
+import static org.Focus_flow.Task.addTask;
+import static org.Focus_flow.ToDoListBuilder.taskAdder;
+
+
+public class TaskBuilder extends ToDoList {
+
+    public TaskBuilder() {
+
     }
-    public TaskBuilder(String name, String description, LocalDateTime deadline, Hierarchy importance) {
-        super(name, description, deadline);
-        this.taskImportance = importance;
-        addTask(this);
+    public static void addTaskUI(){
+
     }
 }
