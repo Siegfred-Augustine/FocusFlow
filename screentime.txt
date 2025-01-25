@@ -1,3 +1,13 @@
+<<<<<<< HEAD
 idea64.exe: 00 hours, 00 minutes
 java.exe: 00 hours, 00 minutes
 explorer.exe: 00 hours, 00 minutes
+=======
+<<<<<<< HEAD
+Code.exe: 00 hours, 00 minutes
+=======
+opera.exe: 00 hours, 03 minutes
+idea64.exe: 00 hours, 02 minutes
+WindowsTerminal.exe: 00 hours, 01 minutes
+>>>>>>> 620194c5ac37cc9ec561a7249b38630f8160859a
+>>>>>>> b3398090434c247e4c0b63d53428e56ca7e3c724
